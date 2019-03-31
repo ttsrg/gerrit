@@ -1,0 +1,4 @@
+ansible-playbook -i inventory/stage installgerrit.yml
+
+ssh 192.168.56.199 -l devops  # -i ~/.ssh/id_rsa   your local user
+

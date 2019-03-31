@@ -1,0 +1,15 @@
+---
+- name: Installing necessary packets
+  package:
+    name:
+    - nano
+    - net-tools
+    - ntp
+    - epel-release
+    - mc
+    state: installed
+
+#enable and start time service
+- name: Enabling ntp
+  service: name=ntpd enabled=yes state=started
+

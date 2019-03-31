@@ -1,0 +1,24 @@
+---
+- name: make directory for Docker Compose file
+  file: path=/opt/nginx state=directory
+  
+- name: make directory for volume
+  file: path=/opt/nginx/conf.d state=directory
+    
+  
+- name: copy  Docker Compose file in dir
+  copy:
+    src: docker-compose.yml
+    dest: /opt/nginx
+    
+    
+- name: copy  conf file to nginx dir
+  copy:
+    src: gerrit.conf
+    dest: /opt/nginx/conf.d
+              
+    
+- name: run  Docker Compose file 
+  shell:  docker-compose up -d
+  args:
+    chdir: /opt/nginx

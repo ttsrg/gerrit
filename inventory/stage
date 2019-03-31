@@ -1,0 +1,2 @@
+[gitter]
+192.168.56.199 ansible_user=vagrant ansible_password=vagrant ansible_connection=paramiko

@@ -1,0 +1,14 @@
+---
+#- name: run nginx via  docker-compose.yml
+#  docker_service:
+#    project_src: .
+- name: docker nginx
+  docker_container:
+    docker_host: unix://var/run/docker.sock
+    name: nginxstit
+    image: stit/nginx:1.14
+#    restart: always
+    ports: 
+    - '80:8080'
+#  volumes:
+#    - /data/db

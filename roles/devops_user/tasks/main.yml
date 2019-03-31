@@ -1,0 +1,18 @@
+---
+- name: Create  group -  devops  w gid
+  group:
+    name: "{{ user_name }}"
+    state: present
+    gid: 7777
+#  become: yes
+  
+- name: Create  user devops w  uid
+  user:
+    name: "{{ user_name }}"
+    append: yes
+    uid: 7777
+    group: 7777
+#  become: yes
+
+- name: include sshaccess
+  include: sshaccess.yml

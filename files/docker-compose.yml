@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  gerrit:
+    image: gerritcodereview/gerrit
+    ports:
+      - "29418:29418"
+      - "8080:8080"
+    links:
+      - postgres
+    depends_on:
+      - postgres
+#      - ldap
+    volumes:
+     - /vagrant/files/gerrit/etc:/var/gerrit/etc
+     - /vagrant/files/gerrit/git:/var/gerrit/git
+     - /vagrant/files/gerrit/index:/var/gerrit/index
+     - /vagrant/files/gerrit/cache:/var/gerrit/cache
+#    entrypoint: java -jar /var/gerrit/bin/gerrit.war init -d /var/gerrit
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=gerrit
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=reviewdb
+    volumes:
+      - /vagrant/files/gerrit/postgres/data:/var/lib/postgresql/data
+

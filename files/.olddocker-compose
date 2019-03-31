@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  gerrit:
+    image: gerritcodereview/gerrit
+    ports:
+      - "29418:29418"
+      - "80:8080"
+    links:
+      - postgres
+    depends_on:
+      - postgres
+      - ldap
+    volumes:
+     - /vagrant/volumes/gerrit/etc:/var/gerrit/etc
+     - /vagrant/volumes/gerrit/git:/var/gerrit/git
+     - /vagrant/volumes/gerrit/index:/var/gerrit/index
+     - /vagrant/volumes/external/gerrit/cache:/var/gerrit/cache
+#    entrypoint: java -jar /var/gerrit/bin/gerrit.war init -d /var/gerrit
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=gerrit
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=reviewdb
+    volumes:
+      - /vagrant/volumes/gerrit/postgres:/var/lib/postgresql/data
+
+  ldap:
+    image: osixia/openldap
+    ports:
+      - "389:389"
+      - "636:636"
+    environment:
+      - LDAP_ADMIN_PASSWORD=secret
+    volumes:
+      - /vagrant/volumes/gerrit/ldap/var:/var/lib/ldap
+      - /vagrant/volumes/gerrit/ldap/etc:/etc/ldap/slapd.d
+
+  ldap-admin:
+    image: osixia/phpldapadmin
+    ports:
+      - "6443:443"
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap

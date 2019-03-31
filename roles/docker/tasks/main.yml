@@ -1,0 +1,66 @@
+---
+- name: Check if Docker is installed
+  command: systemctl status docker
+  register: docker_check
+  ignore_errors: yes
+
+- name: Add docker repo
+  yum_repository:
+    name: docker
+    description: docker stable
+    baseurl: https://download.docker.com/{{ ansible_system|lower }}/{{ ansible_distribution|lower }}/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/stable
+    gpgkey: https://download.docker.com/{{ ansible_system|lower }}/{{ ansible_distribution|lower }}/gpg
+    gpgcheck: yes
+  when: docker_check.stderr.find('service could not be found') != -1
+
+- name: Enable Docker Edge repo
+  ini_file:
+    dest: /etc/yum.repos.d/docer-ce.repo
+    section: 'docker-ce-edge'
+    option: enabled
+    value: 0
+  when: docker_check.stderr.find('service could not be found') != -1
+
+- name: Install Docker
+  package:
+    name:
+      - docker-ce
+    state: present
+  when: docker_check.stderr.find('service could not be found') != -1
+
+- name: Start Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  when: docker_check.stderr.find('service could not be found') != -1
+
+- name: Add user vagrant to docker group
+  user:
+    name: vagrant
+    groups: docker
+    append: yes
+
+- name: Add user devops to docker group
+  user:
+    name: "{{ user_name }}"
+    groups: docker
+    append: yes
+
+
+
+###### Docker-compose check
+ 
+- name: Check if Docker Compose is installed
+  command: docker-compose --version
+  register: docker_compose_check
+  ignore_errors: yes
+
+- name: Download and install Docker Compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.21.2/docker-compose-Linux-x86_64
+    dest: /usr/bin/docker-compose
+    mode: 0755
+  when:
+    - docker_compose_check.msg is defined
+    - docker_compose_check.msg.find('No such file or directory') != -1
